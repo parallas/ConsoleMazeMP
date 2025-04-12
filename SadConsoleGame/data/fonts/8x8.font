@@ -1,0 +1,11 @@
+{
+    "$type": "SadConsole.SadFont, SadConsole",
+    "Name": "8x8",
+    "FilePath": "8x8.png",
+    "GlyphHeight": 8,
+    "GlyphPadding": 0,
+    "GlyphWidth": 8,
+    "SolidGlyphIndex": 219,
+    "Columns": 16,
+    "IsSadExtended": false
+}

@@ -1,4 +1,5 @@
 using System.Text;
+using System.Text.RegularExpressions;
 using SadConsole.Components;
 using SadConsole.Input;
 
@@ -10,6 +11,8 @@ public class TextChat : ScreenObject
     public Console ChatLogConsole { get; private set; }
     public Console ChatInputConsole { get; private set; }
     public List<String> ChatHistory { get; set; } = new List<String>();
+
+    private static readonly Regex _usernameMatcher = _Regex.Username();
 
     public TextChat(int width, int height)
     {
@@ -57,6 +60,17 @@ public class TextChat : ScreenObject
         Children.Add(ChatLogConsole);
 
         IsFocused = true;
+
+        void log(string message) => AddMessage(
+            message
+            .Replace("(SERVER): ", "serv: ")
+            .Replace("(CLIENT): ", "clnt: ")
+        );
+
+        Net.Log += log;
+        Net.LogInfo += log;
+        Net.LogWarning += log;
+        Net.LogError += log;
     }
 
     public override bool ProcessKeyboard(Keyboard keyboard)
@@ -66,10 +80,10 @@ public class TextChat : ScreenObject
         if (keyboard.IsKeyPressed(Keys.Enter))
         {
             // Handle Enter key press
-            var stringValue = ChatInputConsole.GetString(0, ChatLogConsole.Width);
+            var stringValue = ChatInputConsole.GetString(0, ChatLogConsole.Width).Replace('\0', ' ');
             if (stringValue.Trim().Length > 0)
             {
-                AddMessageFromUser(stringValue, Environment.UserName);
+                AddMessageFromUser(stringValue.Trim(), Environment.UserName);
             }
             ChatInputConsole.Clear();
             ChatInputConsole.Cursor.Position = Point.Zero;
@@ -110,7 +124,76 @@ public class TextChat : ScreenObject
 
     public void AddMessageFromUser(string message, string user)
     {
+        if(message.StartsWith('/') && ParseCommand(message))
+            return;
+
         user = user.PadLeft(4);
         AddMessage($"{user[..4]}: {message}");
+    }
+
+    public bool ParseCommand(string message)
+    {
+        if(!message.StartsWith('/'))
+            return false;
+        message = message[1..];
+        var split = message.Split(' ', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+
+        switch(split[0])
+        {
+            case "server":
+            {
+                if(split.Length == 1)
+                {
+                    AddMessage("???");
+                    break;
+                }
+                switch(split[1])
+                {
+                    case "start":
+                    {
+                        ushort port = 25565;
+                        if(split.Length > 2 && ushort.TryParse(split[2], out var result))
+                            port = result;
+                        Net.StartServer(port);
+                        break;
+                    }
+                    case "stop":
+                    {
+                        Net.StopServer();
+                        break;
+                    }
+                }
+                break;
+            }
+            case "join":
+            {
+                string ip = "47.208.146.216:25565";
+                if(split.Length > 1)
+                    ip = split[1];
+                if(!Net.Connect(ip))
+                    AddMessage("already connected");
+                else
+                    AddMessage("connecting...");
+                break;
+            }
+            case "exit":
+            {
+                if(Net.Disconnect())
+                    AddMessage("leaving...");
+                break;
+            }
+            case "cls":
+            {
+                ChatLogConsole.Clear();
+                break;
+            }
+            default:
+            {
+                AddMessage("unknown command");
+                break;
+            }
+        }
+
+        return true;
     }
 }

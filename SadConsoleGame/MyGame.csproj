@@ -22,4 +22,10 @@
     <PackageReference Include="SadConsole.Extended" Version="10.5.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="data/**/*.*">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>
