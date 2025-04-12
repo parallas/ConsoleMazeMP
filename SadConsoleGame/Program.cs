@@ -1,4 +1,5 @@
 ﻿using SadConsole.Configuration;
+using SadConsoleGame;
 
 internal class Program
 {
@@ -9,11 +10,15 @@ internal class Program
         Builder gameStartup = new Builder()
             .SetScreenSize(GameSettings.GAME_WIDTH, GameSettings.GAME_HEIGHT)
             .SetStartingScreen<SadConsoleGame.Scenes.RootScreen>()
-            .ConfigureFonts(ConfigureFonts);
+            .ConfigureFonts(ConfigureFonts)
+            .SkipMonoGameGameCreation();
+
+        Settings.DoFinalDraw = false;
 
         Game.Create(gameStartup);
-        Game.Instance.Run();
-        Game.Instance.Dispose();
+
+        using var game = new Game1();
+        game.Run();
     }
 
     private static void ConfigureFonts(FontConfig config, GameHost host)
