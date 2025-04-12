@@ -23,7 +23,7 @@ class RootScreen : ScreenObject
         // SadConsole.Settings.ResizeMode = Settings.WindowResizeOptions.None;
 
         _mainSurface = new ScreenSurface(GameSettings.GAME_WIDTH, GameSettings.GAME_HEIGHT);
-        Settings.ResizeMode = Settings.WindowResizeOptions.None;
+        SadConsole.Settings.ResizeMode = SadConsole.Settings.WindowResizeOptions.None;
         Game1.Instance.Window.ClientSizeChanged += Game_WindowResized;
 
         // Fill the surface with random characters and colors
@@ -70,9 +70,14 @@ class RootScreen : ScreenObject
         SadConsole.Host.Global.GraphicsDeviceManager.ApplyChanges();
 
         _mainSurface?.Resize(
-            Game1.Instance.Window.ClientBounds.Width / _mainSurface.FontSize.X,
-            Game1.Instance.Window.ClientBounds.Height / _mainSurface.FontSize.Y,
+            Game1.Instance.Window.ClientBounds.Width / _mainSurface.FontSize.X / 2,
+            Game1.Instance.Window.ClientBounds.Height / _mainSurface.FontSize.Y / 2,
             false
+        );
+
+        SadConsole.Host.Global.RecreateRenderOutputHandler(
+            _mainSurface.Width * _mainSurface.FontSize.X,
+            _mainSurface.Height * _mainSurface.FontSize.Y
         );
 
         FillBackground();

@@ -45,7 +45,7 @@ public static class RtScreen
         graphicsDevice.SetRenderTarget(renderTarget2D);
         drawCode?.Invoke();
 
-        int nearestScale = (int)Math.Floor((decimal)MathHelper.Min(widthRatio, heightRatio));
+        int nearestScale = Math.Max((int)Math.Floor((decimal)MathHelper.Min(widthRatio, heightRatio)), 1);
         int scaledRtWidth = rtWidth * nearestScale;
         int scaledRtHeight = rtHeight * nearestScale;
         if (_scaledRt is null || _screenSpaceEffectRt is null ||

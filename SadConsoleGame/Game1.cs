@@ -30,15 +30,18 @@ public class Game1 : Game
         SadConsole.Game.Instance.MonoGameInstance = this;
         SadConsole.Host.Global.GraphicsDeviceManager = _graphics;
 
+        Window.AllowUserResizing = true;
+
         // Initialize the SadConsole engine
         SadConsole.Host.Global.SadConsoleComponent = new SadConsole.Host.SadConsoleGameComponent(this);
         Components.Add(SadConsole.Host.Global.SadConsoleComponent);
 
-        _rt = new(GraphicsDevice, GameSettings.GAME_WIDTH * 8, GameSettings.GAME_HEIGHT * 8);
+        // _rt = new(GraphicsDevice, GameSettings.GAME_WIDTH * 8, GameSettings.GAME_HEIGHT * 8);
+        _rt = new(GraphicsDevice, Window.ClientBounds.Width, Window.ClientBounds.Height);
 
-        // Window.ClientSizeChanged += delegate {
-        //     _rt = new(GraphicsDevice, Window.ClientBounds.Width, Window.ClientBounds.Height);
-        // };
+        Window.ClientSizeChanged += delegate {
+            _rt = new(GraphicsDevice, Window.ClientBounds.Width, Window.ClientBounds.Height);
+        };
 
         RtScreen.Init();
 
