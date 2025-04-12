@@ -12,8 +12,13 @@ public class Game1 : Game
     private GraphicsDeviceManager _graphics;
     private SpriteBatch _spriteBatch;
 
+    internal static Game1 Instance;
+
+    private static RenderTarget2D _rt;
+
     public Game1()
     {
+        Instance = this;
         _graphics = new GraphicsDeviceManager(this);
         Content.RootDirectory = "Content";
         IsMouseVisible = true;
@@ -28,6 +33,14 @@ public class Game1 : Game
         // Initialize the SadConsole engine
         SadConsole.Host.Global.SadConsoleComponent = new SadConsole.Host.SadConsoleGameComponent(this);
         Components.Add(SadConsole.Host.Global.SadConsoleComponent);
+
+        _rt = new(GraphicsDevice, GameSettings.GAME_WIDTH * 8, GameSettings.GAME_HEIGHT * 8);
+
+        // Window.ClientSizeChanged += delegate {
+        //     _rt = new(GraphicsDevice, Window.ClientBounds.Width, Window.ClientBounds.Height);
+        // };
+
+        RtScreen.Init();
 
         base.Initialize();
     }
@@ -55,16 +68,21 @@ public class Game1 : Game
         base.Draw(gameTime);
 
         // Clear the graphics device
-        GraphicsDevice.Clear(Color.CornflowerBlue);
+        // GraphicsDevice.SetRenderTarget(_rt);
+        GraphicsDevice.Clear(Color.Black);
 
-        // Render your scene and render SadConsole to something
-        _spriteBatch.Begin();
-        _spriteBatch.Draw(SadConsole.Host.Global.RenderOutput,
-            new Rectangle(50, 100, SadConsole.Host.Global.RenderOutput.Width / 3,
-                SadConsole.Host.Global.RenderOutput.Height / 3), Color.White);
-        _spriteBatch.Draw(SadConsole.Host.Global.RenderOutput,
-            new Rectangle(150, 25, (int)(SadConsole.Host.Global.RenderOutput.Width / 1.5),
-                (int)(SadConsole.Host.Global.RenderOutput.Height / 1.5)), Color.White);
-        _spriteBatch.End();
+        RtScreen.DrawWithRtOnScreen(
+            _rt,
+            _graphics,
+            _spriteBatch,
+            null!,
+            null!,
+            Color.White,
+            () => {
+                _spriteBatch.Begin(samplerState: SamplerState.PointClamp);
+                _spriteBatch.Draw(SadConsole.Host.Global.RenderOutput, Vector2.Zero, Color.White);
+                _spriteBatch.End();
+            }
+        );
     }
 }
