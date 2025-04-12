@@ -18,7 +18,12 @@ public static class Net
         _server = new();
         _client = new();
 
-        RiptideLogger.Initialize(ConsoleLog, ConsoleLogInfo, ConsoleLogWarning, ConsoleLogError, false);
+        Log += ConsoleLog;
+        LogInfo += ConsoleLogInfo;
+        LogWarning += ConsoleLogWarning;
+        LogError += ConsoleLogError;
+
+        RiptideLogger.Initialize(Log.Invoke, LogInfo.Invoke, LogWarning.Invoke, LogError.Invoke, false);
     }
 
     public static void Update()
@@ -95,7 +100,7 @@ public static class Net
     {
         if(IsServerRunning)
         {
-            ConsoleLog("Server already running");
+            Log?.Invoke("Server already running");
             return false;
         }
 
@@ -107,7 +112,7 @@ public static class Net
     {
         if(!IsServerRunning)
         {
-            ConsoleLog("Server is not running");
+            Log?.Invoke("Server is not running");
             return false;
         }
 
@@ -119,7 +124,7 @@ public static class Net
     {
         if(_client.IsConnected)
         {
-            ConsoleLog("Client already connected");
+            Log?.Invoke("Client already connected");
             return false;
         }
 
@@ -131,7 +136,7 @@ public static class Net
     {
         if(_client.IsNotConnected)
         {
-            ConsoleLog("No connection");
+            Log?.Invoke("No connection");
             return false;
         }
 
