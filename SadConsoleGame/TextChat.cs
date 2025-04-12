@@ -22,13 +22,14 @@ public class TextChat : ScreenObject
             Position = (0, 0),
         };
         Children.Add(_screenSurface);
+        _screenSurface.Fill(Color.White, Color.Black);
         _screenSurface.DrawBox(new Rectangle(0, 0, width, height),
             ShapeParameters.CreateStyledBoxThin(Color.CornflowerBlue));
-        _screenSurface.Print(2, height - 2, "chat: ");
+        _screenSurface.Print(1, height - 2, "chat: ");
 
-        ChatInputConsole = new Console(width - 10, 1)
+        ChatInputConsole = new Console(width - 8, 1)
         {
-            Position = (8, height - 2),
+            Position = (7, height - 2),
             Cursor =
             {
                 IsEnabled = true,
@@ -41,9 +42,9 @@ public class TextChat : ScreenObject
             }
         };
 
-        ChatLogConsole = new Console(width - 4, height - 4)
+        ChatLogConsole = new Console(width - 2, height - 4)
         {
-            Position = (2, 1),
+            Position = (1, 1),
             IsVisible = true,
             Cursor =
             {

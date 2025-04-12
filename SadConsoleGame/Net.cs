@@ -90,10 +90,8 @@ public static class Net
         message.AddString(stringToSend);
         message.AddString(user);
 
-        _client.Send(message); // Sends the message to the server
-        // _server.Send(message, <toClientId>); // Sends the message to a specific client
-        // _server.SendToAll(message); // Sends the message to all connected clients
-        // _server.SendToAll(message, <toClientId>); // Sends the message to all connected clients except the specified one
+        if (_client.IsNotConnected) return;
+        _client.Send(message);
     }
 
     public static bool StartServer(ushort port, ushort maxClientCount = 4)

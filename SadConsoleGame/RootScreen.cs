@@ -13,10 +13,20 @@ class RootScreen : ScreenObject
     public RootScreen()
     {
         // Create a surface that's the same size as the screen.
-        // _mainSurface = new ScreenSurface(GameSettings.GAME_WIDTH, GameSettings.GAME_HEIGHT);
+        _mainSurface = new ScreenSurface(GameSettings.GAME_WIDTH, GameSettings.GAME_HEIGHT);
 
         // Fill the surface with random characters and colors
         // _mainSurface.FillWithRandomGarbage(_mainSurface.Font);
+        Color[] colors = new[] { Color.DarkBlue, Color.Black };
+        float[] colorStops = new[] { 0f, 1f };
+
+        Algorithms.GradientFill(_mainSurface.FontSize,
+            _mainSurface.Surface.Area.Center,
+            _mainSurface.Surface.Height,
+            0,
+            _mainSurface.Surface.Area,
+            new Gradient(colors, colorStops),
+            (x, y, color) => _mainSurface.Surface[x, y].Background = color);
         
         // Create a rectangle box that has a violet foreground and black background.
         // Characters are reset to 0 and mirroring is set to none. FillWithRandomGarbage will
@@ -29,9 +39,9 @@ class RootScreen : ScreenObject
         // Add _mainSurface as a child object of this one. This object, RootScreen, is a simple object
         // and doesn't display anything itself. Since _mainSurface is going to be a child of it, _mainSurface
         // will be displayed.
-        // Children.Add(_mainSurface);
+        Children.Add(_mainSurface);
 
-        _textChat = new TextChat(42, 14)
+        _textChat = new TextChat(40, 14)
         {
             Position = (3, 2),
             IsFocused = true,
