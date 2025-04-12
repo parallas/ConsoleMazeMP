@@ -28,6 +28,8 @@ class RootScreen : ScreenObject
 
         _mainSurface.Children.Add(_textChat);
 
+        RefreshScreen();
+
         Net.Init();
     }
 
@@ -37,11 +39,21 @@ class RootScreen : ScreenObject
         Net.Update();
     }
 
-    void Game_WindowResized(object? sender, EventArgs e)
+    private void Game_WindowResized(object? sender, EventArgs e)
     {
+        RefreshScreen();
+    }
+
+    public void RefreshScreen()
+    {
+        int scaler = 2;
+        float smallerAxisValue = Math.Min(Game1.Instance.Window.ClientBounds.Width,
+            Game1.Instance.Window.ClientBounds.Height);
+        if (smallerAxisValue < 700) scaler = 1;
+
         _mainSurface?.Resize(
-            Game1.Instance.Window.ClientBounds.Width / _mainSurface.FontSize.X / 2,
-            Game1.Instance.Window.ClientBounds.Height / _mainSurface.FontSize.Y / 2,
+            Game1.Instance.Window.ClientBounds.Width / _mainSurface.FontSize.X / scaler,
+            Game1.Instance.Window.ClientBounds.Height / _mainSurface.FontSize.Y / scaler,
             false
         );
 
@@ -52,10 +64,11 @@ class RootScreen : ScreenObject
 
         FillBackground();
 
-        _textChat.Position = new Point(2, _mainSurface.Height - 14 - 2) * 8;
+        _textChat.Position = (new Point((int)(_mainSurface.Width * 0.5), (int)(_mainSurface.Height * 0.5))
+                              - new Point((int)(_textChat.Width * 0.5), (int)(_textChat.Height * 0.5))) * 8;
     }
 
-    void FillBackground()
+    private void FillBackground()
     {
         // _mainSurface.FillWithRandomGarbage(_mainSurface.Font);
 

@@ -7,6 +7,8 @@ namespace SadConsoleGame.Scenes;
 
 public class TextChat : ScreenObject
 {
+    public int Width { get; private set; }
+    public int Height { get; private set; }
     private ScreenSurface _screenSurface;
     public Console ChatLogConsole { get; private set; }
     public Console ChatInputConsole { get; private set; }
@@ -16,6 +18,9 @@ public class TextChat : ScreenObject
 
     public TextChat(int width, int height)
     {
+        Width = width;
+        Height = height;
+
         _screenSurface = new ScreenSurface(width, height)
         {
             IsVisible = true,
