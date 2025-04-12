@@ -71,6 +71,8 @@ public class TextChat : ScreenObject
         Net.LogInfo += log;
         Net.LogWarning += log;
         Net.LogError += log;
+
+        Net.OnReceiveMessage += AddMessageFromUser;
     }
 
     public override bool ProcessKeyboard(Keyboard keyboard)
@@ -80,10 +82,13 @@ public class TextChat : ScreenObject
         if (keyboard.IsKeyPressed(Keys.Enter))
         {
             // Handle Enter key press
-            var stringValue = ChatInputConsole.GetString(0, ChatLogConsole.Width).Replace('\0', ' ');
-            if (stringValue.Trim().Length > 0)
+            var stringValue = ChatInputConsole.GetString(0, ChatLogConsole.Width).Replace('\0', ' ').Trim();
+            if (stringValue.Length > 0)
             {
-                AddMessageFromUser(stringValue.Trim(), Environment.UserName);
+                AddMessageFromUser(stringValue, Environment.UserName);
+
+                if (!stringValue.StartsWith('/'))
+                    Net.SendSimpleMessage(stringValue, Environment.UserName);
             }
             ChatInputConsole.Clear();
             ChatInputConsole.Cursor.Position = Point.Zero;

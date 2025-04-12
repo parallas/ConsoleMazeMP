@@ -9,6 +9,8 @@ public static class Net
     private static Server _server;
     private static Client _client;
 
+    public static event Action<string, string>? OnReceiveMessage;
+
     public static bool IsServerRunning => _server?.IsRunning ?? false;
 
     public static void Init()
@@ -43,14 +45,16 @@ public static class Net
         String messageString = message.GetString();
         ConsoleLog($"Received message from client {clientId}: {messageString}");
 
-        _server.SendToAll(message);
+        _server.SendToAll(message, clientId);
     }
 
     [MessageHandler((ushort)ServerToClient.SendMessage)]
     private static void HandleSimpleMessageClientRpc(Message message)
     {
         string messageString = message.GetString();
+        string messageUser = message.GetString();
         ConsoleLog($"Received message from server: {messageString}");
+        OnReceiveMessage?.Invoke(messageString, messageUser);
     }
 
     public static event Action<string>? Log;
@@ -61,28 +65,25 @@ public static class Net
     public static void ConsoleLog(string message)
     {
         Debug.WriteLine(message);
-        Log?.Invoke(message);
     }
     private static void ConsoleLogInfo(string message)
     {
         Debug.WriteLine($"Info: {message}");
-        LogInfo?.Invoke(message);
     }
     private static void ConsoleLogWarning(string message)
     {
         Debug.WriteLine($"Warning: {message}");
-        LogWarning?.Invoke(message);
     }
     private static void ConsoleLogError(string message)
     {
         Debug.WriteLine($"Error: {message}");
-        LogError?.Invoke(message);
     }
 
-    public static void SendSimpleMessage(string stringToSend)
+    public static void SendSimpleMessage(string stringToSend, string user)
     {
         Message message = Message.Create(MessageSendMode.Reliable, (int)ClientToServer.SendMessage);
         message.AddString(stringToSend);
+        message.AddString(user);
 
         _client.Send(message); // Sends the message to the server
         // _server.Send(message, <toClientId>); // Sends the message to a specific client
