@@ -12,40 +12,17 @@ class RootScreen : ScreenObject
 
     public RootScreen()
     {
-        // Create a surface that's the same size as the screen.
-
-        // SadConsole.Settings.ResizeMode = Settings.WindowResizeOptions.None;
-
-        // var xScale = SadConsole.Host.Global.GraphicsDeviceManager.PreferredBackBufferWidth / 8;
-        // var yScale = SadConsole.Host.Global.GraphicsDeviceManager.PreferredBackBufferHeight / 8;
-        // _mainSurface = new ScreenSurface(xScale, yScale);
-        // _mainSurface.FontSize = _mainSurface.Font.GetFontSize(IFont.Sizes.Four);
-        // SadConsole.Settings.ResizeMode = Settings.WindowResizeOptions.None;
-
         _mainSurface = new ScreenSurface(GameSettings.GAME_WIDTH, GameSettings.GAME_HEIGHT);
         SadConsole.Settings.ResizeMode = SadConsole.Settings.WindowResizeOptions.None;
         Game1.Instance.Window.ClientSizeChanged += Game_WindowResized;
 
-        // Fill the surface with random characters and colors
-        // _mainSurface.FillWithRandomGarbage(_mainSurface.Font);
         FillBackground();
-        
-        // Create a rectangle box that has a violet foreground and black background.
-        // Characters are reset to 0 and mirroring is set to none. FillWithRandomGarbage will
-        // select random characters and mirroring, so this resets it within the box.
-        // _mainSurface.Fill(new Rectangle(3, 3, 23, 3), Color.Violet, Color.Black, 1, Mirror.None);
-        
-        // Print some text at (4, 4) using the foreground and background already there (violet and black)
-        // _mainSurface.Print(4, 4, "Hello from SadConsole");
 
-        // Add _mainSurface as a child object of this one. This object, RootScreen, is a simple object
-        // and doesn't display anything itself. Since _mainSurface is going to be a child of it, _mainSurface
-        // will be displayed.
         Children.Add(_mainSurface);
 
         _textChat = new TextChat(40, 14)
         {
-            Position = (3, 2),
+            Position = new Point(2, _mainSurface.Height - 14 - 2) * 8,
             IsFocused = true,
         };
 
@@ -74,10 +51,14 @@ class RootScreen : ScreenObject
         );
 
         FillBackground();
+
+        _textChat.Position = new Point(2, _mainSurface.Height - 14 - 2) * 8;
     }
 
     void FillBackground()
     {
+        // _mainSurface.FillWithRandomGarbage(_mainSurface.Font);
+
         Color[] colors = new[] { Color.DarkBlue, Color.Black };
         float[] colorStops = new[] { 0f, 1f };
 

@@ -25,6 +25,10 @@ public class TextChat : ScreenObject
         _screenSurface.Fill(Color.White, Color.Black);
         _screenSurface.DrawBox(new Rectangle(0, 0, width, height),
             ShapeParameters.CreateStyledBoxThin(Color.CornflowerBlue));
+        _screenSurface.DrawLine((0, 0), (width, 0), ICellSurface.ConnectedLineThick[0], Color.SteelBlue);
+        _screenSurface.ConnectLines(ICellSurface.ConnectedLineThick);
+        _screenSurface.Print(0, 0, "\u00d5");
+        _screenSurface.Print(width - 1, 0, "\u00b8");
         _screenSurface.Print(1, height - 2, "chat: ");
 
         ChatInputConsole = new Console(width - 8, 1)
