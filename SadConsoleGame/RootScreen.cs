@@ -62,13 +62,6 @@ class RootScreen : ScreenObject
 
     void Game_WindowResized(object? sender, EventArgs e)
     {
-        SadConsole.Host.Global.GraphicsDeviceManager.PreferredBackBufferWidth =
-            Game1.Instance.Window.ClientBounds.Width;
-        SadConsole.Host.Global.GraphicsDeviceManager.PreferredBackBufferHeight =
-            Game1.Instance.Window.ClientBounds.Height;
-
-        SadConsole.Host.Global.GraphicsDeviceManager.ApplyChanges();
-
         _mainSurface?.Resize(
             Game1.Instance.Window.ClientBounds.Width / _mainSurface.FontSize.X / 2,
             Game1.Instance.Window.ClientBounds.Height / _mainSurface.FontSize.Y / 2,

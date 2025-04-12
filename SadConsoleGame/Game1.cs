@@ -36,12 +36,7 @@ public class Game1 : Game
         SadConsole.Host.Global.SadConsoleComponent = new SadConsole.Host.SadConsoleGameComponent(this);
         Components.Add(SadConsole.Host.Global.SadConsoleComponent);
 
-        // _rt = new(GraphicsDevice, GameSettings.GAME_WIDTH * 8, GameSettings.GAME_HEIGHT * 8);
         _rt = new(GraphicsDevice, Window.ClientBounds.Width, Window.ClientBounds.Height);
-
-        Window.ClientSizeChanged += delegate {
-            _rt = new(GraphicsDevice, Window.ClientBounds.Width, Window.ClientBounds.Height);
-        };
 
         RtScreen.Init();
 
@@ -60,7 +55,10 @@ public class Game1 : Game
         if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
             Exit();
 
-        // TODO: Add your update logic here
+        if (_rt.Width != SadConsole.Host.Global.RenderOutput.Width || _rt.Height != SadConsole.Host.Global.RenderOutput.Height)
+        {
+            _rt = new(GraphicsDevice, SadConsole.Host.Global.RenderOutput.Width, SadConsole.Host.Global.RenderOutput.Height);
+        }
 
         base.Update(gameTime);
     }
