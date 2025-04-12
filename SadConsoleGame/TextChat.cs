@@ -69,10 +69,7 @@ public class TextChat : ScreenObject
             var stringValue = ChatInputConsole.GetString(0, ChatLogConsole.Width);
             if (stringValue.Trim().Length > 0)
             {
-                ChatHistory.Add($"{1111}: {stringValue}");
-
-                ChatLogConsole.ShiftUp();
-                ChatLogConsole.Print(0, ChatLogConsole.Height - 1, ChatHistory.Last(), Color.White);
+                AddMessageFromUser(stringValue, Environment.UserName);
             }
             ChatInputConsole.Clear();
             ChatInputConsole.Cursor.Position = Point.Zero;
@@ -102,5 +99,18 @@ public class TextChat : ScreenObject
 
         bool result = ChatInputConsole.ProcessKeyboard(keyboard);
         return result;
+    }
+
+    public void AddMessage(string message)
+    {
+        ChatHistory.Add(message);
+        ChatLogConsole.ShiftUp();
+        ChatLogConsole.Print(0, ChatLogConsole.Height - 1, message, Color.White);
+    }
+
+    public void AddMessageFromUser(string message, string user)
+    {
+        user = user.PadLeft(4);
+        AddMessage($"{user[..4]}: {message}");
     }
 }
