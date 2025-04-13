@@ -3,6 +3,7 @@ using System.Text.RegularExpressions;
 using SadConsole.Components;
 using SadConsole.Effects;
 using SadConsole.Input;
+using SadConsole.Instructions;
 using SadConsole.UI;
 using SadConsole.UI.Controls;
 
@@ -15,7 +16,8 @@ public class TextChat : ScreenObject
     private ScreenSurface _screenSurface;
     public Console ChatLogConsole { get; private set; }
     public TextBoxShowCaret ChatInputTextBox { get; private set; }
-
+    private Queue<String> ChatQueue { get; set; } = new Queue<String>();
+    private DrawString _drawString = new DrawString() { IsFinished = true };
     public List<String> ChatHistory { get; set; } = new List<String>();
 
     private static readonly Regex _usernameMatcher = _Regex.Username();
@@ -41,8 +43,23 @@ public class TextChat : ScreenObject
             MaxLength = width - 9,
             CaretEffect = new Fade()
             {
-                AutoReverse = true, DestinationBackground = new Gradient([new GradientStop(Color.White, 0), new GradientStop(Color.White, 0.4f), new GradientStop(Color.Blue, 0.6f)]),
-                FadeBackground = true, Repeat = true, FadeDuration = TimeSpan.FromSeconds(0.25d), UseCellBackground = false
+                AutoReverse = true,
+                DestinationBackground = new Gradient([
+                    new GradientStop(Color.White, 0),
+                    new GradientStop(Color.White, 0.4f),
+                    new GradientStop(Color.Blue, 0.6f)
+                ]),
+                DestinationForeground = new Gradient([
+                    new GradientStop(Color.Blue, 0),
+                    new GradientStop(Color.Blue, 0.4f),
+                    new GradientStop(Color.White, 0.6f)
+                ]),
+                FadeBackground = true,
+                FadeForeground = true,
+                Repeat = true,
+                FadeDuration = TimeSpan.FromSeconds(0.25d),
+                UseCellBackground = false,
+                UseCellForeground = false,
             },
             Surface = {
                 DefaultBackground = Color.Blue,
@@ -71,7 +88,6 @@ public class TextChat : ScreenObject
             }
         };
         Children.Add(ChatLogConsole);
-
         DrawBox();
 
         void log(string message) => AddMessage(
@@ -86,6 +102,29 @@ public class TextChat : ScreenObject
         Net.LogError += log;
 
         Net.OnReceiveMessage += AddMessageFromUser;
+    }
+
+    public override void Update(TimeSpan delta)
+    {
+        base.Update(delta);
+
+        if (!_drawString.IsFinished) return;
+        if (ChatQueue.TryDequeue(out string? message))
+        {
+            ChatHistory.Add(message);
+            ChatLogConsole.ShiftUp();
+            ChatLogConsole.Cursor.Position = (0, ChatLogConsole.Height - 1);
+            // ChatLogConsole.Cursor.Print(message);
+            _drawString = new DrawString();
+            _drawString.Text = new ColoredString(message, Color.White, Color.Blue);
+            _drawString.TotalTimeToPrint = TimeSpan.FromMilliseconds(10d * message.Length);
+            _drawString.RemoveOnFinished = true;
+            _drawString.Cursor = ChatLogConsole.Cursor;
+            _drawString.Position = ChatLogConsole.Cursor.Position;
+            ChatLogConsole.SadComponents.Add(_drawString);
+        }
+
+        // ChatLogConsole.Print(0, ChatLogConsole.Height - 1, message, Color.White);
     }
 
     public override bool ProcessKeyboard(Keyboard keyboard)
@@ -126,9 +165,7 @@ public class TextChat : ScreenObject
 
     public void AddMessage(string message)
     {
-        ChatHistory.Add(message);
-        ChatLogConsole.ShiftUp();
-        ChatLogConsole.Print(0, ChatLogConsole.Height - 1, message, Color.White);
+        ChatQueue.Enqueue(message);
     }
 
     public void AddMessageFromUser(string message, string user)
