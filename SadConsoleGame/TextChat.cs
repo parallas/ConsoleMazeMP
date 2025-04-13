@@ -14,10 +14,7 @@ public class TextChat : ScreenObject
     public int Height { get; private set; }
     private ScreenSurface _screenSurface;
     public Console ChatLogConsole { get; private set; }
-    public TextBox ChatInputTextBox { get; private set; }
-    public ScreenSurface FakeCursor { get; private set; }
-    private double _fakeCursorBlinkTimer = 0;
-    private int _fakeCursorLastPosition = 0;
+    public TextBoxShowCaret ChatInputTextBox { get; private set; }
 
     public List<String> ChatHistory { get; set; } = new List<String>();
 
@@ -38,16 +35,14 @@ public class TextChat : ScreenObject
         ControlHost controls = new();
         _screenSurface.SadComponents.Add(controls);
 
-        ChatInputTextBox = new TextBox(width - 8)
+        ChatInputTextBox = new TextBoxShowCaret(width - 8)
         {
             Position = (7, height - 2),
             MaxLength = width - 9,
-            // CaretEffect = new Recolor() {Background = Color.White, Foreground = Color.Black, DoBackground = true, DoForeground = true, RunEffectOnApply = true, RemoveOnFinished = true},
-            CaretEffect = new BlinkGlyph()
+            CaretEffect = new Fade()
             {
-                GlyphIndex = 95,
-                BlinkSpeed = System.TimeSpan.FromSeconds(0.4d),
-                RunEffectOnApply = false,
+                AutoReverse = true, DestinationBackground = new Gradient([new GradientStop(Color.White, 0), new GradientStop(Color.White, 0.4f), new GradientStop(Color.Blue, 0.6f)]),
+                FadeBackground = true, Repeat = true, FadeDuration = TimeSpan.FromSeconds(0.25d), UseCellBackground = false
             },
             Surface = {
                 DefaultBackground = Color.Blue,
@@ -55,10 +50,11 @@ public class TextChat : ScreenObject
             },
             FocusOnMouseClick = false,
         };
-        ChatInputTextBox.SetThemeColors(new Colors(){Appearance_ControlNormal = new ColoredGlyph(Color.White, Color.Blue)});
+
+        var themeState = new ColoredGlyph(Color.White, Color.Blue);
+        ChatInputTextBox.SetThemeColors(new Colors(){Appearance_ControlNormal = themeState});
         controls.Add(ChatInputTextBox);
         IsFocused = true;
-        controls.FocusedControl = ChatInputTextBox;
 
         ChatLogConsole = new Console(width - 2, height - 4)
         {
@@ -78,10 +74,6 @@ public class TextChat : ScreenObject
 
         DrawBox();
 
-        FakeCursor = new ScreenSurface(1, 1);
-        FakeCursor.Print(0, 0, " ", Color.White, Color.White);
-        Children.Add(FakeCursor);
-
         void log(string message) => AddMessage(
             message
             .Replace("(SERVER): ", "serv: ")
@@ -94,33 +86,6 @@ public class TextChat : ScreenObject
         Net.LogError += log;
 
         Net.OnReceiveMessage += AddMessageFromUser;
-    }
-
-    public override void Update(TimeSpan delta)
-    {
-        base.Update(delta);
-
-        FakeCursor.Update(delta);
-        _fakeCursorBlinkTimer += delta.TotalSeconds;
-        if (_fakeCursorBlinkTimer >= 0.3)
-        {
-            _fakeCursorBlinkTimer -= 0.3;
-            _fakeCursorBlinkTimer = Math.Max(_fakeCursorBlinkTimer, 0);
-
-            FakeCursor.IsVisible = !FakeCursor.IsVisible;
-        }
-
-        if (_fakeCursorLastPosition != ChatInputTextBox.CaretPosition)
-        {
-            _fakeCursorBlinkTimer = 0;
-            FakeCursor.IsVisible = true;
-        }
-        FakeCursor.Position = (
-            ChatInputTextBox.Position.X + ChatInputTextBox.CaretPosition,
-            ChatInputTextBox.Position.Y
-        );
-
-        _fakeCursorLastPosition = ChatInputTextBox.CaretPosition;
     }
 
     public override bool ProcessKeyboard(Keyboard keyboard)
@@ -184,6 +149,17 @@ public class TextChat : ScreenObject
 
         switch(split[0])
         {
+            case "host":
+            {
+                ushort port = 25565;
+                if(split.Length > 1 && ushort.TryParse(split[1], out var result))
+                    port = result;
+                Net.StartServer(port);
+
+                string ip = $"127.0.0.1:{port}";
+                Net.Connect(ip);
+                break;
+            }
             case "server":
             {
                 if(split.Length == 1)
@@ -214,16 +190,15 @@ public class TextChat : ScreenObject
                 string ip = "47.208.146.216:25565";
                 if(split.Length > 1)
                     ip = split[1];
-                if(!Net.Connect(ip))
-                    AddMessage("already connected");
-                else
-                    AddMessage("connecting...");
+                Net.Connect(ip);
+
                 break;
             }
             case "exit":
             {
-                if(Net.Disconnect())
-                    AddMessage("leaving...");
+                Net.Disconnect();
+                if(Net.IsServerRunning)
+                    Net.StopServer();
                 break;
             }
             case "cls":
