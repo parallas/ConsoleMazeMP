@@ -116,7 +116,7 @@ public class TextChat : ScreenObject
             ChatLogConsole.Cursor.Position = (0, ChatLogConsole.Height - 1);
 
             _drawString = new DrawString
-            {th
+            {
                 Text = ColoredString.Parser.Parse($"[c:r b:Blue]{message}"),
                 TotalTimeToPrint = TimeSpan.FromMilliseconds(10d * message.Length),
                 RemoveOnFinished = true,
