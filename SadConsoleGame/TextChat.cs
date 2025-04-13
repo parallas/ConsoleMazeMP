@@ -1,7 +1,10 @@
 using System.Text;
 using System.Text.RegularExpressions;
 using SadConsole.Components;
+using SadConsole.Effects;
 using SadConsole.Input;
+using SadConsole.UI;
+using SadConsole.UI.Controls;
 
 namespace SadConsoleGame.Scenes;
 
@@ -11,7 +14,11 @@ public class TextChat : ScreenObject
     public int Height { get; private set; }
     private ScreenSurface _screenSurface;
     public Console ChatLogConsole { get; private set; }
-    public Console ChatInputConsole { get; private set; }
+    public TextBox ChatInputTextBox { get; private set; }
+    public ScreenSurface FakeCursor { get; private set; }
+    private double _fakeCursorBlinkTimer = 0;
+    private int _fakeCursorLastPosition = 0;
+
     public List<String> ChatHistory { get; set; } = new List<String>();
 
     private static readonly Regex _usernameMatcher = _Regex.Username();
@@ -27,29 +34,31 @@ public class TextChat : ScreenObject
             Position = (0, 0),
         };
         Children.Add(_screenSurface);
-        _screenSurface.Fill(Color.White, Color.Black);
-        _screenSurface.DrawBox(new Rectangle(0, 0, width, height),
-            ShapeParameters.CreateStyledBoxThin(Color.CornflowerBlue));
-        _screenSurface.DrawLine((0, 0), (width, 0), ICellSurface.ConnectedLineThick[0], Color.SteelBlue);
-        _screenSurface.ConnectLines(ICellSurface.ConnectedLineThick);
-        _screenSurface.Print(0, 0, "\u00d5");
-        _screenSurface.Print(width - 1, 0, "\u00b8");
-        _screenSurface.Print(1, height - 2, "chat: ");
 
-        ChatInputConsole = new Console(width - 8, 1)
+        ControlHost controls = new();
+        _screenSurface.SadComponents.Add(controls);
+
+        ChatInputTextBox = new TextBox(width - 8)
         {
             Position = (7, height - 2),
-            Cursor =
+            MaxLength = width - 9,
+            // CaretEffect = new Recolor() {Background = Color.White, Foreground = Color.Black, DoBackground = true, DoForeground = true, RunEffectOnApply = true, RemoveOnFinished = true},
+            CaretEffect = new BlinkGlyph()
             {
-                IsEnabled = true,
-                IsVisible = true,
-                MouseClickReposition = true,
+                GlyphIndex = 95,
+                BlinkSpeed = System.TimeSpan.FromSeconds(0.4d),
+                RunEffectOnApply = false,
             },
-            Surface =
-            {
-                DefaultBackground = Color.Blue
-            }
+            Surface = {
+                DefaultBackground = Color.Blue,
+                DefaultForeground = Color.White,
+            },
+            FocusOnMouseClick = false,
         };
+        ChatInputTextBox.SetThemeColors(new Colors(){Appearance_ControlNormal = new ColoredGlyph(Color.White, Color.Blue)});
+        controls.Add(ChatInputTextBox);
+        IsFocused = true;
+        controls.FocusedControl = ChatInputTextBox;
 
         ChatLogConsole = new Console(width - 2, height - 4)
         {
@@ -65,11 +74,13 @@ public class TextChat : ScreenObject
                 DefaultBackground = Color.Blue
             }
         };
-
-        Children.Add(ChatInputConsole);
         Children.Add(ChatLogConsole);
 
-        IsFocused = true;
+        DrawBox();
+
+        FakeCursor = new ScreenSurface(1, 1);
+        FakeCursor.Print(0, 0, " ", Color.White, Color.White);
+        Children.Add(FakeCursor);
 
         void log(string message) => AddMessage(
             message
@@ -85,6 +96,33 @@ public class TextChat : ScreenObject
         Net.OnReceiveMessage += AddMessageFromUser;
     }
 
+    public override void Update(TimeSpan delta)
+    {
+        base.Update(delta);
+
+        FakeCursor.Update(delta);
+        _fakeCursorBlinkTimer += delta.TotalSeconds;
+        if (_fakeCursorBlinkTimer >= 0.3)
+        {
+            _fakeCursorBlinkTimer -= 0.3;
+            _fakeCursorBlinkTimer = Math.Max(_fakeCursorBlinkTimer, 0);
+
+            FakeCursor.IsVisible = !FakeCursor.IsVisible;
+        }
+
+        if (_fakeCursorLastPosition != ChatInputTextBox.CaretPosition)
+        {
+            _fakeCursorBlinkTimer = 0;
+            FakeCursor.IsVisible = true;
+        }
+        FakeCursor.Position = (
+            ChatInputTextBox.Position.X + ChatInputTextBox.CaretPosition,
+            ChatInputTextBox.Position.Y
+        );
+
+        _fakeCursorLastPosition = ChatInputTextBox.CaretPosition;
+    }
+
     public override bool ProcessKeyboard(Keyboard keyboard)
     {
         if (!IsFocused) return false;
@@ -92,7 +130,7 @@ public class TextChat : ScreenObject
         if (keyboard.IsKeyPressed(Keys.Enter))
         {
             // Handle Enter key press
-            var stringValue = ChatInputConsole.GetString(0, ChatLogConsole.Width).Replace('\0', ' ').Trim();
+            var stringValue = ChatInputTextBox.Text.Replace('\0', ' ').Trim();
             if (stringValue.Length > 0)
             {
                 AddMessageFromUser(stringValue, Environment.UserName);
@@ -100,34 +138,25 @@ public class TextChat : ScreenObject
                 if (!stringValue.StartsWith('/'))
                     Net.SendSimpleMessage(stringValue, Environment.UserName);
             }
-            ChatInputConsole.Clear();
-            ChatInputConsole.Cursor.Position = Point.Zero;
+            ChatInputTextBox.Text = "";
+            ChatInputTextBox.CaretPosition = 0;
             return true;
         }
 
-        if (ChatInputConsole.Cursor.Position.X >= ChatInputConsole.Width - 1)
-        {
-            if (keyboard.IsKeyPressed(Keys.Left))
-            {
-                ChatInputConsole.Cursor.Position -= (1, 0);
-                return true;
-            }
-            if (keyboard.IsKeyPressed(Keys.Back))
-            {
-                // Handle Backspace key press
-                if (ChatInputConsole.Cursor.Position.X > 0)
-                {
-                    ChatInputConsole.Cursor.Position = new Point(ChatInputConsole.Cursor.Position.X - 1, 0);
-                    ChatInputConsole.Print(ChatInputConsole.Cursor.Position.X, ChatInputConsole.Cursor.Position.Y, " ");
-                }
-                return true;
-            }
-
-            return false;
-        }
-
-        bool result = ChatInputConsole.ProcessKeyboard(keyboard);
+        bool result = ChatInputTextBox.ProcessKeyboard(keyboard);
         return result;
+    }
+
+    private void DrawBox()
+    {
+        _screenSurface.Fill(Color.White, Color.Black);
+        _screenSurface.DrawBox(new Rectangle(0, 0, Width, Height),
+            ShapeParameters.CreateStyledBoxThin(Color.CornflowerBlue));
+        _screenSurface.DrawLine((0, 0), (Width, 0), ICellSurface.ConnectedLineThick[0], Color.SteelBlue);
+        _screenSurface.ConnectLines(ICellSurface.ConnectedLineThick);
+        _screenSurface.Print(0, 0, "\u00d5");
+        _screenSurface.Print(Width - 1, 0, "\u00b8");
+        _screenSurface.Print(1, Height - 2, "chat: ");
     }
 
     public void AddMessage(string message)

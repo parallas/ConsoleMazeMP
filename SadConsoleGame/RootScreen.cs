@@ -1,7 +1,10 @@
 ﻿using System.Diagnostics;
 using Riptide;
 using Riptide.Utils;
+using SadConsole.Effects;
 using SadConsole.Input;
+using SadConsole.UI;
+using SadConsole.UI.Controls;
 
 namespace SadConsoleGame.Scenes;
 
@@ -23,9 +26,8 @@ class RootScreen : ScreenObject
         _textChat = new TextChat(40, 14)
         {
             Position = new Point(2, _mainSurface.Height - 14 - 2) * 8,
-            IsFocused = true,
+            // IsFocused = true,
         };
-
         _mainSurface.Children.Add(_textChat);
 
         RefreshScreen();

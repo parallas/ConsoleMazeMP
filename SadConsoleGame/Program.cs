@@ -1,4 +1,5 @@
 ﻿using SadConsole.Configuration;
+using SadConsole.SplashScreens;
 using SadConsoleGame;
 
 internal class Program
