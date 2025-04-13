@@ -114,13 +114,15 @@ public class TextChat : ScreenObject
             ChatHistory.Add(message);
             ChatLogConsole.ShiftUp();
             ChatLogConsole.Cursor.Position = (0, ChatLogConsole.Height - 1);
-            // ChatLogConsole.Cursor.Print(message);
-            _drawString = new DrawString();
-            _drawString.Text = new ColoredString(message, Color.White, Color.Blue);
-            _drawString.TotalTimeToPrint = TimeSpan.FromMilliseconds(10d * message.Length);
-            _drawString.RemoveOnFinished = true;
-            _drawString.Cursor = ChatLogConsole.Cursor;
-            _drawString.Position = ChatLogConsole.Cursor.Position;
+
+            _drawString = new DrawString
+            {th
+                Text = ColoredString.Parser.Parse($"[c:r b:Blue]{message}"),
+                TotalTimeToPrint = TimeSpan.FromMilliseconds(10d * message.Length),
+                RemoveOnFinished = true,
+                Cursor = ChatLogConsole.Cursor,
+                Position = ChatLogConsole.Cursor.Position
+            };
             ChatLogConsole.SadComponents.Add(_drawString);
         }
 
