@@ -185,6 +185,8 @@ public class TextChat : ScreenObject
             return false;
         message = message[1..];
         var split = message.Split(' ', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+        if(split.Length == 0)
+            return false;
 
         switch(split[0])
         {
