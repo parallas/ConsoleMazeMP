@@ -24,6 +24,6 @@ internal class Program
 
     private static void ConfigureFonts(FontConfig config, GameHost host)
     {
-        config.UseCustomFont("data/fonts/8x8.font");
+        config.UseCustomFont(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "data/fonts/8x8.font"));
     }
 }
