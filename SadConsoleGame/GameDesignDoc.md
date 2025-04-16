@@ -40,13 +40,19 @@ Options:
   -s --simple   Execute the "simple" version of the command.
 
 About:
-Used to flash keys from storage. Refer to the table below to determine which key(s) to use. 
+Used to flash keys from storage. 
+Refer to the table below to determine which key(s) to use. 
 -------------------------------------
-1. If there are less than 5 keys in the list, use the "simple" command.
-2. If at least two keys in the list begin with "f", use the second one of the two.
-3. If at least three keys all begin with the same letter, use the last key in the list.
-4. If the sum of the vowels in the list is greater than 20, use the first key in the list that contains a vowel.
-5. If none of the above, use the fourth key in the list if it has an even number of letters, otherwise use the 5th key.
+1. If there are less than 5 keys in the list, use the
+    "simple" command.
+2. If at least two keys in the list begin with "f", use the
+    second one of the two.
+3. If at least three keys all begin with the same letter, use
+    the last key in the list.
+4. If the sum of the vowels in the list is greater than 20,
+    use the first key in the list that contains a vowel.
+5. If none of the above, use the fourth key in the list if it
+    has an even number of letters, otherwise use the 5th key.
 -------------------------------------
 ```
 
