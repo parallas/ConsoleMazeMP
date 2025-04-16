@@ -25,6 +25,9 @@ the maze. Any mistake in the command and the team will receive a strike.
 If they receive 3 strikes, the game is over and they lose.
 
 ### Example
+
+###### (software names / command arguments procedurally generated from preset options)
+
 bscit finds software called "mke". Annie finds a man page for software
 called "Mad Key Effigy". They mention what they've found to each other
 and recognize the man page belongs to the software due to the acronym.
