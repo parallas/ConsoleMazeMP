@@ -34,7 +34,7 @@ public class MainMenu : ScreenObject
         {
             var keyInputButton = _keyInputButtons[index];
             keyInputButton.Position = (0, height - 1 - (_keyInputButtons.Count - index) * 2);
-            _host.Add(keyInputButton);
+            _surface.Children.Add(keyInputButton);
         }
 
         _surface.Print(0, 0, "Mainframe / Grid Computing");
