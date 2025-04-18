@@ -36,8 +36,6 @@ public class MainMenu : BaseMenu
         }
 
         _surface.Print(0, 0, "Mainframe / Grid Computing");
-
-        IsFocused = true;
     }
 
     public override void Update(TimeSpan delta)

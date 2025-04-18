@@ -18,12 +18,14 @@ public static class MainMenuManager
 
         menu.IsEnabled = true;
         menu.IsVisible = true;
+        menu.IsFocused = true;
     }
 
     public static void DisableMenu(BaseMenu menu)
     {
         menu.IsEnabled = false;
         menu.IsVisible = false;
+        menu.IsFocused = false;
     }
 
     public static void DisableAllMenus()

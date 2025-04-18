@@ -6,6 +6,7 @@ using SadConsole.Input;
 using SadConsole.Instructions;
 using SadConsole.UI;
 using SadConsole.UI.Controls;
+using SadConsoleGame.Menus;
 
 namespace SadConsoleGame.Scenes;
 
@@ -15,7 +16,7 @@ public class TextChat : ScreenObject
     public int Height { get; private set; }
     private ScreenSurface _screenSurface;
     public Console ChatLogConsole { get; private set; }
-    public TextBoxShowCaret ChatInputTextBox { get; private set; }
+    public CustomTextBox ChatInputTextBox { get; private set; }
     private Queue<String> ChatQueue { get; set; } = new Queue<String>();
     private DrawString _drawString = new DrawString() { IsFinished = true };
     public List<String> ChatHistory { get; set; } = new List<String>();
@@ -37,41 +38,8 @@ public class TextChat : ScreenObject
         ControlHost controls = new();
         _screenSurface.SadComponents.Add(controls);
 
-        ChatInputTextBox = new TextBoxShowCaret(width - 8)
-        {
-            Position = (7, height - 2),
-            MaxLength = width - 9,
-            CaretEffect = new Fade()
-            {
-                AutoReverse = true,
-                DestinationBackground = new Gradient([
-                    new GradientStop(Color.White, 0),
-                    new GradientStop(Color.White, 0.4f),
-                    new GradientStop(Color.Blue, 0.6f)
-                ]),
-                DestinationForeground = new Gradient([
-                    new GradientStop(Color.Blue, 0),
-                    new GradientStop(Color.Blue, 0.4f),
-                    new GradientStop(Color.White, 0.6f)
-                ]),
-                FadeBackground = true,
-                FadeForeground = true,
-                Repeat = true,
-                FadeDuration = TimeSpan.FromSeconds(0.25d),
-                UseCellBackground = false,
-                UseCellForeground = false,
-            },
-            Surface = {
-                DefaultBackground = Color.Blue,
-                DefaultForeground = Color.White,
-            },
-            FocusOnMouseClick = false,
-        };
-
-        var themeState = new ColoredGlyph(Color.White, Color.Blue);
-        ChatInputTextBox.SetThemeColors(new Colors(){Appearance_ControlNormal = themeState});
+        ChatInputTextBox = new CustomTextBox(width - 9) { Position = (7, height - 2) };
         controls.Add(ChatInputTextBox);
-        IsFocused = true;
 
         ChatLogConsole = new Console(width - 2, height - 4)
         {

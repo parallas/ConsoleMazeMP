@@ -24,14 +24,11 @@ class RootScreen : ScreenObject
 
         Children.Add(_mainSurface);
 
-        _textChat = new TextChat(40, 14)
-        {
-            Position = new Point(2, _mainSurface.Height - 14 - 2) * 8,
-        };
-        // _mainSurface.Children.Add(_textChat);
-
         MainMenuManager.HostGame = new HostGame(_mainSurface);
         MainMenuManager.MainMenu = new MainMenu(_mainSurface);
+
+        _textChat = new TextChat(40, 14);
+        // _mainSurface.Children.Add(_textChat);
 
         _mainSurface.Children.Add(MainMenuManager.MainMenu);
         _mainSurface.Children.Add(MainMenuManager.HostGame);
