@@ -14,6 +14,7 @@ public class KeyInputButton : Console
 
     private bool _isHeldDown = false;
     private string _labelKeyed;
+    private DrawString _drawString = new DrawString();
 
     public KeyInputButton(int width, Keys key, string label, Action onPress) : base(width, 1)
     {
@@ -21,8 +22,8 @@ public class KeyInputButton : Console
         _label = label;
         _onPress = onPress;
 
-        // Surface.DefaultBackground = Color.Transparent;
-        // Surface.Fill(Color.White, Color.Transparent);
+        Surface.DefaultBackground = Color.Transparent;
+        Surface.Fill(Color.White, Color.Transparent);
 
         var keyString = key.ToString();
         if (label.Contains(keyString, StringComparison.OrdinalIgnoreCase))
@@ -37,18 +38,19 @@ public class KeyInputButton : Console
             _labelKeyed = $"[{keyString}] {label}";
         }
 
-        var drawString = new DrawString
+        _drawString = new DrawString
         {
-            Text = ColoredString.Parser.Parse(_labelKeyed),
+            Text = new ColoredString(_labelKeyed, Color.White, Color.Transparent),
             TotalTimeToPrint = TimeSpan.FromMilliseconds(50d * _labelKeyed.Length),
             RemoveOnFinished = true,
         };
-        SadComponents.Add(drawString);
+        SadComponents.Add(_drawString);
         // Surface.Print(0, 0, _labelKeyed);
     }
 
     public override bool ProcessKeyboard(Keyboard state)
     {
+        if (!_drawString.IsFinished) return false;
         if (state.IsKeyPressed(_key))
         {
             _isHeldDown = true;
