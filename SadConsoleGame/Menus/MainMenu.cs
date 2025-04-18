@@ -1,45 +1,49 @@
 using SadConsole.Input;
 using SadConsole.UI;
+using SadConsoleGame.Menus;
 
 namespace SadConsoleGame;
 
-public class MainMenu : ScreenObject
+public class MainMenu : BaseMenu
 {
-    public int Width { get; private set; }
-    public int Height { get; private set; }
-
     private ScreenSurface _surface;
     private ControlHost _host;
 
     private List<KeyInputButton> _keyInputButtons = new List<KeyInputButton>();
-    public MainMenu(int width, int height)
-    {
-        Width = width;
-        Height = height;
 
-        _surface = new ScreenSurface(width, height);
+    public MainMenu(ScreenSurface screenSurface) : base(screenSurface, 32, 16)
+    {
+        _surface = new ScreenSurface(Width, Height);
         _surface.Fill(Color.White, Color.Transparent, 0);
         Children.Add(_surface);
 
-        _host = new ControlHost();
-        _host.ClearOnAdded = false;
+        _host = new ControlHost
+        {
+            ClearOnAdded = false
+        };
         _surface.SadComponents.Add(_host);
 
-        _keyInputButtons.Add(new KeyInputButton(width, Keys.H, "Host", () => {}));
-        _keyInputButtons.Add(new KeyInputButton(width, Keys.J, "Join", () => {}));
-        _keyInputButtons.Add(new KeyInputButton(width, Keys.A, "About", () => {}));
-        _keyInputButtons.Add(new KeyInputButton(width, Keys.O, "Options", () => {}));
-        _keyInputButtons.Add(new KeyInputButton(width, Keys.Q, "Quit", () => { Environment.Exit(0); }));
+        _keyInputButtons.Add(new KeyInputButton(Width, Keys.H, "Host", MainMenuManager.GoToHostGame));
+        _keyInputButtons.Add(new KeyInputButton(Width, Keys.J, "Join", () => {}));
+        _keyInputButtons.Add(new KeyInputButton(Width, Keys.A, "About", () => {}));
+        _keyInputButtons.Add(new KeyInputButton(Width, Keys.O, "Options", () => {}));
+        _keyInputButtons.Add(new KeyInputButton(Width, Keys.Q, "Quit", () => { Environment.Exit(0); }));
         for (var index = 0; index < _keyInputButtons.Count; index++)
         {
             var keyInputButton = _keyInputButtons[index];
-            keyInputButton.Position = (0, height - 1 - (_keyInputButtons.Count - index) * 2);
+            keyInputButton.Position = (0, Height - 1 - (_keyInputButtons.Count - index) * 2);
             _surface.Children.Add(keyInputButton);
         }
 
         _surface.Print(0, 0, "Mainframe / Grid Computing");
 
         IsFocused = true;
+    }
+
+    public override void Update(TimeSpan delta)
+    {
+        base.Update(delta);
+        Center();
     }
 
     public override bool ProcessKeyboard(Keyboard keyboard)

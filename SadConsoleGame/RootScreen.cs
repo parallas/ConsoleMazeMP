@@ -5,6 +5,7 @@ using SadConsole.Effects;
 using SadConsole.Input;
 using SadConsole.UI;
 using SadConsole.UI.Controls;
+using SadConsoleGame.Menus;
 
 namespace SadConsoleGame.Scenes;
 
@@ -12,8 +13,6 @@ class RootScreen : ScreenObject
 {
     private ScreenSurface? _mainSurface;
     private TextChat _textChat;
-
-    private MainMenu _mainMenu;
 
     public RootScreen()
     {
@@ -31,8 +30,13 @@ class RootScreen : ScreenObject
         };
         // _mainSurface.Children.Add(_textChat);
 
-        _mainMenu = new MainMenu(32, 16);
-        _mainSurface.Children.Add(_mainMenu);
+        MainMenuManager.HostGame = new HostGame(_mainSurface);
+        MainMenuManager.MainMenu = new MainMenu(_mainSurface);
+
+        _mainSurface.Children.Add(MainMenuManager.MainMenu);
+        _mainSurface.Children.Add(MainMenuManager.HostGame);
+
+        MainMenuManager.GoToMainMenu();
 
         RefreshScreen();
 
@@ -72,9 +76,6 @@ class RootScreen : ScreenObject
 
         _textChat.Position = (new Point((int)(_mainSurface.Width * 0.5), (int)(_mainSurface.Height * 0.5))
                               - new Point((int)(_textChat.Width * 0.5), (int)(_textChat.Height * 0.5))) * 8;
-
-        _mainMenu.Position = (new Point((int)(_mainSurface.Width * 0.5), (int)(_mainSurface.Height * 0.5))
-                              - new Point((int)(_mainMenu.Width * 0.5), (int)(_mainMenu.Height * 0.5))) * 8;
     }
 
     private void FillBackground()
