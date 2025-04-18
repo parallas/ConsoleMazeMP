@@ -47,20 +47,6 @@ public class KeyInputButton : Console
         // Surface.Print(0, 0, _labelKeyed);
     }
 
-    public override void Update(TimeSpan delta)
-    {
-        if (_isHeldDown)
-        {
-            var cells = Surface.GetCells(new Rectangle(0, 0, Width, 1)).ToArray();
-            for (int i = 0; i < cells.Length; i++)
-            {
-                cells[i].
-            }
-        }
-
-        base.Update(delta);
-    }
-
     public override bool ProcessKeyboard(Keyboard state)
     {
         if (state.IsKeyPressed(_key))
