@@ -12,4 +12,6 @@ public abstract class BaseMenu(ScreenSurface parentSurface, int width, int heigh
                     - new Point((int)(Width * 0.5),
                         (int)(Height * 0.5))) * 8;
     }
+
+    public virtual void Start() { }
 }

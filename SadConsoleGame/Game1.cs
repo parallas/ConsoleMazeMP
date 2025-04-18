@@ -56,9 +56,6 @@ public class Game1 : Game
 
     protected override void Update(GameTime gameTime)
     {
-        if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
-            Exit();
-
         if (_rt.Width != SadConsole.Host.Global.RenderOutput.Width || _rt.Height != SadConsole.Host.Global.RenderOutput.Height)
         {
             _rt = new(GraphicsDevice, SadConsole.Host.Global.RenderOutput.Width, SadConsole.Host.Global.RenderOutput.Height);

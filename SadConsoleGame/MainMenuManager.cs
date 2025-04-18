@@ -19,6 +19,8 @@ public static class MainMenuManager
         menu.IsEnabled = true;
         menu.IsVisible = true;
         menu.IsFocused = true;
+
+        menu.Start();
     }
 
     public static void DisableMenu(BaseMenu menu)
