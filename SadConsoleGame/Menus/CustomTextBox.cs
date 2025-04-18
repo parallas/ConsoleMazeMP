@@ -9,7 +9,7 @@ public class CustomTextBox : TextBoxShowCaret
     public CustomTextBox(int width) : base(width + 1)
     {
         MaxLength = width;
-        CaretEffect = new Fade()
+        CaretEffect = new Fade
         {
             AutoReverse = true,
             DestinationBackground = new Gradient([

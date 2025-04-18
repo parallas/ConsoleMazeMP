@@ -6,6 +6,8 @@ public static class MainMenuManager
 {
     public static MainMenu MainMenu;
     public static HostGame HostGame;
+    public static JoinGame JoinGame;
+    public static GameScreen GameScreen;
 
     private static readonly List<BaseMenu> Menus = new List<BaseMenu>();
 
@@ -34,6 +36,8 @@ public static class MainMenuManager
     {
         DisableMenu(MainMenu);
         DisableMenu(HostGame);
+        DisableMenu(GameScreen);
+        DisableMenu(JoinGame);
     }
 
     public static void GoToMainMenu()
@@ -44,5 +48,15 @@ public static class MainMenuManager
     public static void GoToHostGame()
     {
         EnableMenu(HostGame, true);
+    }
+
+    public static void GoToGameScreen()
+    {
+        EnableMenu(GameScreen, true);
+    }
+
+    public static void GoToJoinGame()
+    {
+        EnableMenu(JoinGame, true);
     }
 }

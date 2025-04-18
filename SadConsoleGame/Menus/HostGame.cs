@@ -58,6 +58,20 @@ public class HostGame : BaseMenu
             return true;
         }
 
+        if (keyboard.IsKeyReleased(Keys.Enter))
+        {
+            MainMenuManager.GameScreen.Username = Environment.UserName;
+            MainMenuManager.GoToGameScreen();
+
+            ushort port = 25565;
+            if (_portTextBox.Text.Length > 0) port = ushort.Parse(_portTextBox.Text);
+            Net.StartServer(port);
+
+            string ip = $"127.0.0.1:{port}";
+            Net.Connect(ip);
+            return true;
+        }
+
         var caretPosition = _portTextBox.CaretPosition;
         var result = _portTextBox.ProcessKeyboard(keyboard);
         var filteredString = new string(_portTextBox.Text.Where(char.IsDigit).ToArray());

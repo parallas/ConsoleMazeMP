@@ -24,7 +24,7 @@ public class MainMenu : BaseMenu
         _surface.SadComponents.Add(_host);
 
         _keyInputButtons.Add(new KeyInputButton(Width, Keys.H, "Host", MainMenuManager.GoToHostGame));
-        _keyInputButtons.Add(new KeyInputButton(Width, Keys.J, "Join", () => {}));
+        _keyInputButtons.Add(new KeyInputButton(Width, Keys.J, "Join", MainMenuManager.GoToJoinGame));
         _keyInputButtons.Add(new KeyInputButton(Width, Keys.A, "About", () => {}));
         _keyInputButtons.Add(new KeyInputButton(Width, Keys.O, "Options", () => {}));
         _keyInputButtons.Add(new KeyInputButton(Width, Keys.Q, "Quit", () => { Environment.Exit(0); }));

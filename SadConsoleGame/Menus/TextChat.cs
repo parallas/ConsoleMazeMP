@@ -21,12 +21,14 @@ public class TextChat : ScreenObject
     private DrawString _drawString = new DrawString() { IsFinished = true };
     public List<String> ChatHistory { get; set; } = new List<String>();
 
+    public string Username;
     private static readonly Regex _usernameMatcher = _Regex.Username();
 
-    public TextChat(int width, int height)
+    public TextChat(int width, int height, string username)
     {
         Width = width;
         Height = height;
+        Username = username;
 
         _screenSurface = new ScreenSurface(width, height)
         {
@@ -52,7 +54,8 @@ public class TextChat : ScreenObject
             },
             Surface =
             {
-                DefaultBackground = Color.Blue
+                DefaultBackground = Color.Blue,
+                DefaultForeground = Color.White,
             }
         };
         Children.Add(ChatLogConsole);
@@ -70,6 +73,15 @@ public class TextChat : ScreenObject
         Net.LogError += log;
 
         Net.OnReceiveMessage += AddMessageFromUser;
+    }
+
+    public void Reset()
+    {
+        ChatQueue.Clear();
+        ChatHistory.Clear();
+        ChatLogConsole.Clear();
+        ChatInputTextBox.Text = "";
+        ChatInputTextBox.CaretPosition = 0;
     }
 
     public override void Update(TimeSpan delta)
@@ -99,18 +111,16 @@ public class TextChat : ScreenObject
 
     public override bool ProcessKeyboard(Keyboard keyboard)
     {
-        if (!IsFocused) return false;
-
         if (keyboard.IsKeyPressed(Keys.Enter))
         {
             // Handle Enter key press
             var stringValue = ChatInputTextBox.Text.Replace('\0', ' ').Trim();
             if (stringValue.Length > 0)
             {
-                AddMessageFromUser(stringValue, Environment.UserName);
+                AddMessageFromUser(stringValue, Username);
 
                 if (!stringValue.StartsWith('/'))
-                    Net.SendSimpleMessage(stringValue, Environment.UserName);
+                    Net.SendSimpleMessage(stringValue, Username);
             }
             ChatInputTextBox.Text = "";
             ChatInputTextBox.CaretPosition = 0;
@@ -208,6 +218,8 @@ public class TextChat : ScreenObject
                 Net.Disconnect();
                 if(Net.IsServerRunning)
                     Net.StopServer();
+
+                MainMenuManager.GoToMainMenu();
                 break;
             }
             case "cls":

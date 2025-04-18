@@ -1,3 +1,4 @@
+using SadConsole.Effects;
 using SadConsole.UI;
 using SadConsole.UI.Controls;
 
@@ -8,6 +9,19 @@ public class TextBoxShowCaret : TextBox
     private int _oldCaretPosition;
     private ControlStates _oldState = ControlStates.Disabled;
     private string _editingText = string.Empty;
+
+    private bool _caretVisible = true;
+    public bool CaretVisible
+    {
+        get => _caretVisible;
+        set
+        {
+            _caretVisible = value;
+            IsDirty = true;
+            _oldState = ControlStates.Disabled;
+            UpdateAndRedraw(TimeSpan.Zero);
+        }
+    }
 
     public TextBoxShowCaret(int width) : base(width)
     {
@@ -70,7 +84,8 @@ public class TextBoxShowCaret : TextBox
             _oldState = State;
             _editingText = Text;
             CaretEffect.Restart();
-            Surface.SetEffect(CaretPosition - LeftDrawOffset, 0, CaretEffect);
+
+            if (CaretVisible) Surface.SetEffect(CaretPosition - LeftDrawOffset, 0, CaretEffect);
         }
     }
 }
