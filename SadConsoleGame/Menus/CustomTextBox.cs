@@ -1,4 +1,5 @@
 using SadConsole.Effects;
+using SadConsole.Input;
 using SadConsole.UI;
 using SadConsole.UI.Controls;
 
@@ -6,8 +7,10 @@ namespace SadConsoleGame.Menus;
 
 public class CustomTextBox : TextBoxShowCaret
 {
-    public CustomTextBox(int width) : base(width + 1)
+    private bool _numbersOnly = false;
+    public CustomTextBox(int width, bool numbersOnly = false) : base(width + 1)
     {
+        _numbersOnly = numbersOnly;
         MaxLength = width;
         CaretEffect = new Fade
         {
@@ -40,5 +43,24 @@ public class CustomTextBox : TextBoxShowCaret
             Appearance_ControlFocused = themeState,
             Appearance_ControlOver = themeState
         });
+    }
+
+    public override bool ProcessKeyboard(Keyboard keyboard)
+    {
+        if (_numbersOnly)
+        {
+            var caretPosition = CaretPosition;
+            var result = base.ProcessKeyboard(keyboard);
+            var filteredString = new string(Text.Where(char.IsDigit).ToArray());
+            if (filteredString != Text)
+            {
+                Text = filteredString;
+                CaretPosition = caretPosition;
+                return false;
+            }
+            return result;
+        }
+
+        return base.ProcessKeyboard(keyboard);
     }
 }

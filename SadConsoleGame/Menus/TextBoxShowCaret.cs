@@ -16,6 +16,7 @@ public class TextBoxShowCaret : TextBox
         get => _caretVisible;
         set
         {
+            if (_caretVisible == value) return;
             _caretVisible = value;
             IsDirty = true;
             _oldState = ControlStates.Disabled;

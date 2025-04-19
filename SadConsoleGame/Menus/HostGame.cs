@@ -3,7 +3,7 @@ using SadConsole.UI;
 
 namespace SadConsoleGame.Menus;
 
-public class HostGame : BaseMenu
+public class HostGame : SequencedMenu
 {
     private ScreenSurface _surface;
 
@@ -23,8 +23,10 @@ public class HostGame : BaseMenu
 
         _surface.Print(0, 4, "PORT:");
 
-        _portTextBox = new CustomTextBox(5) { Position = (6, 4) };
+        _portTextBox = new CustomTextBox(5, true) { Position = (6, 4) };
         controls.Add(_portTextBox);
+        
+        Elements = [_portTextBox];
 
         _placeholderSurface = new ScreenSurface(5, 1)  { Position = (6, 4) };
         _placeholderSurface.Fill(new Color(1, 1, 1, 0.8f), Color.Transparent);
@@ -52,36 +54,25 @@ public class HostGame : BaseMenu
 
     public override bool ProcessKeyboard(Keyboard keyboard)
     {
-        if (keyboard.IsKeyReleased(Keys.Escape))
+        if (keyboard.IsKeyPressed(Keys.Escape))
         {
             MainMenuManager.GoToMainMenu();
             return true;
         }
 
-        if (keyboard.IsKeyReleased(Keys.Enter))
-        {
-            MainMenuManager.GameScreen.Username = Environment.UserName;
-            MainMenuManager.GoToGameScreen();
+        return base.ProcessKeyboard(keyboard);
+    }
 
-            ushort port = 25565;
-            if (_portTextBox.Text.Length > 0) port = ushort.Parse(_portTextBox.Text);
-            Net.StartServer(port);
+    internal override void SubmitFinal()
+    {
+        MainMenuManager.GameScreen.Username = Environment.UserName;
+        MainMenuManager.GoToGameScreen();
 
-            string ip = $"127.0.0.1:{port}";
-            Net.Connect(ip);
-            return true;
-        }
+        ushort port = 25565;
+        if (_portTextBox.Text.Length > 0) port = ushort.Parse(_portTextBox.Text);
+        Net.StartServer(port);
 
-        var caretPosition = _portTextBox.CaretPosition;
-        var result = _portTextBox.ProcessKeyboard(keyboard);
-        var filteredString = new string(_portTextBox.Text.Where(char.IsDigit).ToArray());
-        if (filteredString != _portTextBox.Text)
-        {
-            _portTextBox.Text = filteredString;
-            _portTextBox.CaretPosition = caretPosition;
-            return false;
-        }
-
-        return result;
+        string ip = $"127.0.0.1:{port}";
+        Net.Connect(ip);
     }
 }
