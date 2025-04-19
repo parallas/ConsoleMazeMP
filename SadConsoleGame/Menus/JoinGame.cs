@@ -23,17 +23,17 @@ public class JoinGame : SequencedMenu
         ControlHost controls = new() {ClearOnAdded = false};
         _surface.SadComponents.Add(controls);
 
-        _surface.Print(0, 4, "IP:");
-        _addressTextBox = new CustomTextBox(Width - 7) { Position = (6, 4) };
-        controls.Add(_addressTextBox);
-
-        _surface.Print(0, 6, "NAME:");
-        _nameTextBox = new CustomTextBox(4) { Position = (6, 6), CaretVisible = false };
+        _surface.Print(0, 4, "NAME:");
+        _nameTextBox = new CustomTextBox(4) { Position = (6, 4), CaretVisible = false };
         controls.Add(_nameTextBox);
 
-        Elements = [_addressTextBox, _nameTextBox];
+        _surface.Print(0, 6, "IP:");
+        _addressTextBox = new CustomTextBox(Width - 7) { Position = (6, 6) };
+        controls.Add(_addressTextBox);
 
-        _placeholderSurface = new ScreenSurface(Width, 1)  { Position = (6, 4) };
+        Elements = [_nameTextBox, _addressTextBox];
+
+        _placeholderSurface = new ScreenSurface(Width, 1)  { Position = (6, 6) };
         _placeholderSurface.Fill(new Color(1, 1, 1, 0.8f), Color.Transparent);
         _placeholderSurface.Print(0, 0, "127.0.0.1:25565");
         _surface.Children.Add(_placeholderSurface);
@@ -62,8 +62,8 @@ public class JoinGame : SequencedMenu
         _addressTextBox.Text = "";
         _addressTextBox.CaretPosition = 0;
 
-        _addressTextBox.CaretVisible = true;
-        _nameTextBox.CaretVisible = false;
+        _nameTextBox.CaretVisible = true;
+        _addressTextBox.CaretVisible = false;
 
         ElementIndex = 0;
     }
