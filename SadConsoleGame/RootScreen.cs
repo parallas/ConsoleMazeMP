@@ -2,6 +2,7 @@
 using Riptide;
 using Riptide.Utils;
 using SadConsole.Effects;
+using SadConsole.Host;
 using SadConsole.Input;
 using SadConsole.UI;
 using SadConsole.UI.Controls;
@@ -11,7 +12,7 @@ namespace SadConsoleGame.Scenes;
 
 class RootScreen : ScreenObject
 {
-    private ScreenSurface? _mainSurface;
+    private ScreenSurface _mainSurface;
 
     public RootScreen()
     {
@@ -19,6 +20,7 @@ class RootScreen : ScreenObject
         SadConsole.Settings.ResizeMode = SadConsole.Settings.WindowResizeOptions.None;
         Game1.Instance.Window.ClientSizeChanged += Game_WindowResized;
 
+        SadConsole.Settings.ClearColor = Color.Transparent;
         FillBackground();
 
         Children.Add(_mainSurface);
@@ -74,10 +76,10 @@ class RootScreen : ScreenObject
 
     private void FillBackground()
     {
-        // _mainSurface.FillWithRandomGarbage(_mainSurface.Font);
+        return;
 
-        Color[] colors = new[] { Color.DarkBlue, Color.Black };
-        float[] colorStops = new[] { 0f, 1f };
+        Color[] colors = [Color.DarkBlue, Color.Black];
+        float[] colorStops = [0f, 1f];
 
         Algorithms.GradientFill(_mainSurface.FontSize,
             _mainSurface.Surface.Area.Center,

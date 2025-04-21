@@ -16,6 +16,8 @@ public class Game1 : Game
 
     private static RenderTarget2D _rt;
 
+    private readonly TestFakePerspective _testFakePerspective = new TestFakePerspective();
+
     public Game1()
     {
         Instance = this;
@@ -40,6 +42,8 @@ public class Game1 : Game
 
         RtScreen.Init();
 
+        ContentLoader.Initialize(Content, _graphics.GraphicsDevice);
+
         base.Initialize();
     }
 
@@ -61,6 +65,8 @@ public class Game1 : Game
             _rt = new(GraphicsDevice, SadConsole.Host.Global.RenderOutput.Width, SadConsole.Host.Global.RenderOutput.Height);
         }
 
+        _testFakePerspective.Update((float)gameTime.ElapsedGameTime.TotalSeconds);
+
         base.Update(gameTime);
     }
 
@@ -68,10 +74,6 @@ public class Game1 : Game
     {
         // Do your offscreen drawing (the SadConsole component gets drawn here)
         base.Draw(gameTime);
-
-        // Clear the graphics device
-        // GraphicsDevice.SetRenderTarget(_rt);
-        GraphicsDevice.Clear(Color.Black);
 
         RtScreen.DrawWithRtOnScreen(
             _rt,
@@ -81,6 +83,12 @@ public class Game1 : Game
             null!,
             Color.White,
             () => {
+                GraphicsDevice.Clear(Color.DarkBlue);
+
+                _spriteBatch.Begin(samplerState: SamplerState.PointClamp);
+                _testFakePerspective.Draw(_spriteBatch, new Vector2(_rt.Width, _rt.Height));
+                _spriteBatch.End();
+
                 _spriteBatch.Begin(samplerState: SamplerState.PointClamp);
                 _spriteBatch.Draw(SadConsole.Host.Global.RenderOutput, Vector2.Zero, Color.White);
                 _spriteBatch.End();
