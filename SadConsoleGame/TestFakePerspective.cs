@@ -16,7 +16,7 @@ public class TestFakePerspective
 
     public TestFakePerspective()
     {
-        int tileDistance = 10;
+        int tileDistance = 8;
         _renderObjects = new List<RenderObject>(20 * 20);
         for (int x = 0; x < 20; x++)
         for (int y = 0; y < 20; y++)
@@ -45,6 +45,7 @@ public class TestFakePerspective
         var zoomInput = (keyboardState.IsKeyDown(Keys.OemCloseBrackets) ? 1 : 0) -
                         (keyboardState.IsKeyDown(Keys.OemOpenBrackets) ? 1 : 0);
         _camPos.Z += zoomInput * 3f * deltaTime;
+        _camPos.Z = Math.Clamp(_camPos.Z, 3, 15);
 
         // var camPos2d = new Vector2(MathF.Sin(_counter) * 64f, MathF.Cos(_counter) * 64f) * deltaTime * 10f;
         // var camPosZ = (MathF.Cos(_counter * 1.0f + 32.12f) + 1) / 2 + 8;
@@ -59,13 +60,16 @@ public class TestFakePerspective
         foreach (var renderObject in _renderObjects)
         {
             var calcScale = CalculatePerspectiveAmount(renderObject.Position.Z);
-            if (calcScale > 10f) continue;
+            if (calcScale < 0) continue;
+            var opacity = 1f;
+            if (calcScale > 10f && renderObject.Position.Z >= 1f) opacity = 1 - (calcScale - 10f) / 2f;
+            if (opacity < 0) continue;
             var pos = TransformPosition(renderObject.Position, screenSize);
             spriteBatch.Draw(
                 tex,
                 pos,
                 null,
-                Color.Lerp(Color.MediumBlue, Color.LightBlue, calcScale / 10f),
+                Color.Lerp(Color.MediumBlue, Color.LightBlue, calcScale / 10f) * opacity,
                 0f,
                 Vector2.One * 4f,
                 Vector2.One * TransformScale(renderObject.Position.Z),
